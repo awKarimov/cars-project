@@ -8,6 +8,8 @@ const elOfflinePage = document.getElementById("offlinePage");
 const elFilterValueSelect = document.getElementById("filterValueSelect");
 const elFilterTypeSelect = document.getElementById("filterTypeSelect");
 const elSearchInput = document.getElementById("searchInput");
+const elFilterInput = document.getElementById("filterInput");
+const elLoading = document.getElementById("loading");
 
 let backendData = null;
 let worker = new Worker("./worker.js");
@@ -25,6 +27,9 @@ window.addEventListener("DOMContentLoaded", () => {
     .then((res) => {
       backendData = res;
       changeLocalData(backendData.data);
+      elLoading.classList.add("hidden");
+      elFilterInput.classList.remove("hidden");
+      elFilterInput.classList.add("flex");
     })
     .catch((error) => {
       alert(error.message);
@@ -44,7 +49,6 @@ elFilterValueSelect.addEventListener("change", (evt) => {
   const value = evt.target[evt.target.selectedIndex].value;
   filterValue = value;
 
-  const elContainer = document.getElementById("container");
   elContainer.innerHTML = null;
 
   if (filterKey && filterValue) {
@@ -122,12 +126,20 @@ elContainer.addEventListener("click", (evt) => {
 
   if (target.classList.contains("js-delete")) {
     if (checkAuth() && confirm("Rostdan ham o`chirmoqchimisiz?")) {
+      elContainer.innerHTML = null;
+      elLoading.classList.remove("hidden");
+      elFilterInput.classList.add("hidden");
+      elFilterInput.classList.remove("flex");
       deleteElement(target.id)
         .then((id) => {
           deleteElementLocal(id);
         })
         .catch()
-        .finally(() => {});
+        .finally(() => {
+          elLoading.classList.add("hidden");
+          elFilterInput.classList.remove("hidden");
+          elFilterInput.classList.add("flex");
+        });
     } else {
       location.href = "./pages/login.html";
       alert("Ro`yxatdan o`tishingiz kerak");
