@@ -15,15 +15,22 @@ export function ui(data) {
     const elHorsePower = clone.querySelector("#horsepower");
     const elColorName = clone.querySelector("#colorName");
 
+    const elEditBtn = clone.querySelector(".js-edit");
+    const elDeleteBtn = clone.querySelector(".js-delete");
+    const elInfoBtn = clone.querySelector(".js-info");
+
+    elEditBtn.id = element.id;
+    elDeleteBtn.id = element.id;
+    elInfoBtn.id - element.id;
+
     elTitle.innerText = element.name;
     elDescription.innerText = element.description;
-    elYear.innerText = element.year;
-    elColorName.innerText = element.colorName;
-    elCountry.innerText = element.country;
-    elCategory.innerText = element.category;
-    elMaxSpeed.innerText = element.maxSpeed;
-    elHorsePower.innerText = element.horsepower;
-
+    elYear.innerHTML = `<strong>Yil:</strong> ${element.year}`;
+    elColorName.innerHTML = `<strong>Rang:</strong> ${element.colorName}`;
+    elCountry.innerHTML = `<strong>Davlat:</strong> ${element.country}`;
+    elCategory.innerHTML = `<strong>Turkum:</strong> ${element.category}`;
+    elMaxSpeed.innerHTML = `<strong>Max Tezligi:</strong> ${element.maxSpeed}`;
+    elHorsePower.innerHTML = `<strong>Ot kuchi:</strong> ${element.horsepower}`;
     elContainer.append(clone);
   });
 }

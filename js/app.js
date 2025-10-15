@@ -1,4 +1,7 @@
-import { getAll } from "./request.js";
+import { checkAuth } from "./check-auth.js";
+import { deleteElementLocal } from "./crud.js";
+import { changeLocalData } from "./localData.js";
+import { deleteElement, getAll } from "./request.js";
 import { ui } from "./ui.js";
 
 const elOfflinePage = document.getElementById("offlinePage");
@@ -21,7 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
   getAll()
     .then((res) => {
       backendData = res;
-      ui(backendData.data);
+      changeLocalData(backendData.data);
     })
     .catch((error) => {
       alert(error.message);
@@ -99,4 +102,35 @@ window.addEventListener("online", () => {
 
 window.addEventListener("offline", () => {
   elOfflinePage.classList.remove("hidden");
+});
+
+// Crud
+const elContainer = document.getElementById("container");
+
+elContainer.addEventListener("click", (evt) => {
+  const target = evt.target;
+
+  // Edit
+  if (target.classList.contains("js-edit")) {
+    if (checkAuth()) {
+    } else {
+      alert("Ro`yxatdan o`tishingiz kerak");
+    }
+  }
+
+  // Delete
+
+  if (target.classList.contains("js-delete")) {
+    if (checkAuth() && confirm("Rostdan ham o`chirmoqchimisiz?")) {
+      deleteElement(target.id)
+        .then((id) => {
+          deleteElementLocal(id);
+        })
+        .catch()
+        .finally(() => {});
+    } else {
+      location.href = "./pages/login.html";
+      alert("Ro`yxatdan o`tishingiz kerak");
+    }
+  }
 });
