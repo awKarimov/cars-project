@@ -1,7 +1,7 @@
 import { checkAuth } from "./check-auth.js";
-import { deleteElementLocal } from "./crud.js";
-import { changeLocalData } from "./localData.js";
-import { deleteElement, getAll } from "./request.js";
+import { deleteElementLocal, editElementLocal } from "./crud.js";
+import { changeLocalData, localData } from "./localData.js";
+import { deleteElement, editElement, getAll } from "./request.js";
 import { ui } from "./ui.js";
 
 const elOfflinePage = document.getElementById("offlinePage");
@@ -10,11 +10,14 @@ const elFilterTypeSelect = document.getElementById("filterTypeSelect");
 const elSearchInput = document.getElementById("searchInput");
 const elFilterInput = document.getElementById("filterInput");
 const elLoading = document.getElementById("loading");
+const elEditForm = document.getElementById("editForm");
+const elEditModal = document.getElementById("editModal");
 
 let backendData = null;
 let worker = new Worker("./worker.js");
 let filterKey = null;
 let filterValue = null;
+let editedElementId = null;
 
 window.addEventListener("DOMContentLoaded", () => {
   if (window.navigator.onLine === true) {
@@ -117,6 +120,16 @@ elContainer.addEventListener("click", (evt) => {
   // Edit
   if (target.classList.contains("js-edit")) {
     if (checkAuth()) {
+      editedElementId = target.id;
+      const elEditedElementTitle =
+        document.getElementById("editedElementTitle");
+      elEditModal.showModal();
+
+      const foundElement = localData.find((el) => el.id == target.id);
+
+      elEditedElementTitle.textContent = foundElement.name;
+      elEditForm.name.value = foundElement.name;
+      elEditForm.description.value = foundElement.description;
     } else {
       alert("Ro`yxatdan o`tishingiz kerak");
     }
@@ -144,5 +157,31 @@ elContainer.addEventListener("click", (evt) => {
       location.href = "./pages/login.html";
       alert("Ro`yxatdan o`tishingiz kerak");
     }
+  }
+});
+
+elEditForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+
+  const formData = new FormData(elEditForm);
+  const result = {};
+
+  formData.forEach((value, key) => {
+    result[key] = value;
+  });
+
+  if (editedElementId) {
+    result.id = editedElementId;
+    editElement(result)
+      .then((res) => {
+        console.log(res);
+
+        editElementLocal(res);
+      })
+      .catch(() => {})
+      .finally(() => {
+        editedElementId = null;
+        elEditModal.close();
+      });
   }
 });

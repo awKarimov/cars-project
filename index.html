@@ -66,12 +66,36 @@
             </label>
           </div>
           <div>
-            <button class="btn btn-success">Add</button>
+            <button class="btn btn-success" id="addCar">Add</button>
           </div>
         </div>
         <div class="grid grid-cols-3 gap-5" id="container"></div>
       </div>
     </section>
+
+    <!-- Modals -->
+
+    <dialog id="editModal" class="modal">
+      <div class="modal-box">
+        <form method="dialog">
+          <button
+            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            ✕
+          </button>
+        </form>
+        <h3 class="text-lg font-bold" id="editedElementTitle"></h3>
+        <p class="py-4">Siz shu elementni tahrirlayapsiz</p>
+        <form id="editForm">
+          <input type="text" name="name" placeholder="name" class="input" />
+          <input
+            type="text"
+            name="description"
+            placeholder="description"
+            class="input" />
+          <button class="btn btn-active">Tasdiqlash</button>
+        </form>
+      </div>
+    </dialog>
 
     <!-- Templates -->
     <template id="cardTemplate">
@@ -116,7 +140,7 @@
                   clip-rule="evenodd"></path>
               </svg>
             </button>
-            <button class="btn btn-info js-info">
+            <a target="_blank" class="btn btn-info js-info">
               <svg
                 class="pointer-events-none"
                 width="15"
@@ -130,7 +154,7 @@
                   fill-rule="evenodd"
                   clip-rule="evenodd"></path>
               </svg>
-            </button>
+            </a>
           </div>
         </div>
       </div>
