@@ -2,7 +2,10 @@ import { checkAuth } from "./check-auth.js";
 import { deleteElementLocal, editElementLocal } from "./crud.js";
 import { changeLocalData, localData } from "./localData.js";
 import { deleteElement, editElement, getAll } from "./request.js";
-import { ui } from "./ui.js";
+import { pagination, ui } from "./ui.js";
+
+const limit = 12;
+let skip = 0;
 
 const elOfflinePage = document.getElementById("offlinePage");
 const elFilterValueSelect = document.getElementById("filterValueSelect");
@@ -26,9 +29,10 @@ window.addEventListener("DOMContentLoaded", () => {
     elOfflinePage.classList.remove("hidden");
   }
 
-  getAll()
+  getAll(`?limit=${limit}&skip=${skip}`)
     .then((res) => {
       backendData = res;
+      pagination(backendData.total, backendData.limit, backendData.skip);
       changeLocalData(backendData.data);
       elLoading.classList.add("hidden");
       elFilterInput.classList.remove("hidden");
@@ -182,6 +186,34 @@ elEditForm.addEventListener("submit", (evt) => {
       .finally(() => {
         editedElementId = null;
         elEditModal.close();
+      });
+  }
+});
+
+// Pagination
+
+const elPagination = document.getElementById("pagination");
+
+elPagination.addEventListener("click", (evt) => {
+  if (evt.target.classList.contains("js-page")) {
+    skip = evt.target.dataset.skip;
+
+    getAll(`?limit=${limit}&skip=${skip}`)
+      .then((res) => {
+        elLoading.classList.remove("hidden");
+        elFilterInput.classList.add("hidden");
+        elFilterInput.classList.remove("flex");
+        backendData = res;
+        ui(res.data);
+        pagination(res.total, res.limit, res.skip);
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+      .finally(() => {
+        elLoading.classList.add("hidden");
+        elFilterInput.classList.remove("hidden");
+        elFilterInput.classList.add("flex");
       });
   }
 });
