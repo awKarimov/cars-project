@@ -1,20 +1,20 @@
 import { checkAuth } from "./check-auth.js";
 import { deleteElementLocal, editElementLocal } from "./crud.js";
-import { changeLocalData, localData } from "./localData.js";
+import { changeLocaleData, localData } from "./local-data.js";
 import { deleteElement, editElement, getAll } from "./request.js";
 import { pagination, ui } from "./ui.js";
 
 const limit = 12;
 let skip = 0;
 
-const elOfflinePage = document.getElementById("offlinePage");
-const elFilterValueSelect = document.getElementById("filterValueSelect");
-const elFilterTypeSelect = document.getElementById("filterTypeSelect");
-const elSearchInput = document.getElementById("searchInput");
-const elFilterInput = document.getElementById("filterInput");
-const elLoading = document.getElementById("loading");
-const elEditForm = document.getElementById("editForm");
+// Internet yo'qligida chiqivchi biror narsa
 const elEditModal = document.getElementById("editModal");
+const elEditedForm = document.getElementById("editForm");
+const elContainer = document.getElementById("container");
+const elOfflinePage = document.getElementById("offlinePage");
+const elFilterTypeSelect = document.getElementById("filterTypeSelect");
+const elFilterValueSelect = document.getElementById("filterValueSelect");
+const elSearchInput = document.getElementById("searchInput");
 
 let backendData = null;
 let worker = new Worker("./worker.js");
@@ -23,20 +23,16 @@ let filterValue = null;
 let editedElementId = null;
 
 window.addEventListener("DOMContentLoaded", () => {
-  if (window.navigator.onLine === true) {
-    elOfflinePage.classList.add("hidden");
-  } else {
+  if (window.navigator.onLine === false) {
     elOfflinePage.classList.remove("hidden");
+  } else {
+    elOfflinePage.classList.add("hidden");
   }
-
   getAll(`?limit=${limit}&skip=${skip}`)
     .then((res) => {
       backendData = res;
       pagination(backendData.total, backendData.limit, backendData.skip);
-      changeLocalData(backendData.data);
-      elLoading.classList.add("hidden");
-      elFilterInput.classList.remove("hidden");
-      elFilterInput.classList.add("flex");
+      changeLocaleData(backendData.data);
     })
     .catch((error) => {
       alert(error.message);
@@ -47,7 +43,7 @@ elFilterTypeSelect.addEventListener("change", (evt) => {
   const value = evt.target[evt.target.selectedIndex].value;
   filterKey = value;
   worker.postMessage({
-    functionName: "filterByType",
+    functionName: "fiterByType",
     params: [backendData.data, value],
   });
 });
@@ -55,10 +51,9 @@ elFilterTypeSelect.addEventListener("change", (evt) => {
 elFilterValueSelect.addEventListener("change", (evt) => {
   const value = evt.target[evt.target.selectedIndex].value;
   filterValue = value;
-
+  const elContainer = document.getElementById("container");
   elContainer.innerHTML = null;
-
-  if (filterKey && filterValue) {
+  if (filterValue && filterKey) {
     getAll(`?${filterKey}=${filterValue}`)
       .then((res) => {
         ui(res.data);
@@ -80,8 +75,7 @@ elSearchInput.addEventListener("input", (evt) => {
 worker.addEventListener("message", (evt) => {
   // Select
   const response = evt.data;
-
-  if (response.target === "filterByType") {
+  if (response.target === "fiterByType") {
     elFilterValueSelect.classList.remove("hidden");
     elFilterValueSelect.innerHTML = "";
     const option = document.createElement("option");
@@ -89,16 +83,15 @@ worker.addEventListener("message", (evt) => {
     option.disabled = true;
     option.textContent = "All";
     elFilterValueSelect.appendChild(option);
-
-    result.forEach((element) => {
+    result.forEach((el) => {
       const option = document.createElement("option");
-      option.textContent = element;
-      option.value = element;
+      option.value = el;
+      option.textContent = el;
       elFilterValueSelect.appendChild(option);
     });
   } else if (response.target === "search") {
     const elContainer = document.getElementById("container");
-    elContainer.innerHTML = null;
+    elContainer.innerHTML = "";
     if (response.result.length > 0) {
       ui(response.result);
     } else {
@@ -115,71 +108,59 @@ window.addEventListener("offline", () => {
   elOfflinePage.classList.remove("hidden");
 });
 
-// Crud
-const elContainer = document.getElementById("container");
+// crud
 
 elContainer.addEventListener("click", (evt) => {
   const target = evt.target;
 
   // Edit
+
   if (target.classList.contains("js-edit")) {
     if (checkAuth()) {
       editedElementId = target.id;
-      const elEditedElementTitle =
-        document.getElementById("editedElementTitle");
       elEditModal.showModal();
-
       const foundElement = localData.find((el) => el.id == target.id);
-
-      elEditedElementTitle.textContent = foundElement.name;
-      elEditForm.name.value = foundElement.name;
-      elEditForm.description.value = foundElement.description;
+      elEditedForm.name.value = foundElement.name;
+      elEditedForm.description.value = foundElement.description;
     } else {
-      alert("Ro`yxatdan o`tishingiz kerak");
+      window.location.href = "../pages/login.html";
+      alert("Ro'yhatdan o'tishingiz kerak");
     }
+  }
+
+  // Get
+
+  if (target.classList.contains("js-info")) {
   }
 
   // Delete
 
   if (target.classList.contains("js-delete")) {
-    if (checkAuth() && confirm("Rostdan ham o`chirmoqchimisiz?")) {
-      elContainer.innerHTML = null;
-      elLoading.classList.remove("hidden");
-      elFilterInput.classList.add("hidden");
-      elFilterInput.classList.remove("flex");
+    if (checkAuth() && confirm("Rostdan o'chirmoqchimisiz")) {
       deleteElement(target.id)
         .then((id) => {
           deleteElementLocal(id);
         })
-        .catch()
-        .finally(() => {
-          elLoading.classList.add("hidden");
-          elFilterInput.classList.remove("hidden");
-          elFilterInput.classList.add("flex");
-        });
+        .catch(() => {})
+        .finally(() => {});
     } else {
-      location.href = "./pages/login.html";
-      alert("Ro`yxatdan o`tishingiz kerak");
+      alert("Ro'yhatdan o'tishingiz kerak");
+      window.location.href = "../pages/login.html";
     }
   }
 });
 
-elEditForm.addEventListener("submit", (evt) => {
+elEditedForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
-
-  const formData = new FormData(elEditForm);
+  const formData = new FormData(elEditedForm);
   const result = {};
-
   formData.forEach((value, key) => {
     result[key] = value;
   });
-
   if (editedElementId) {
     result.id = editedElementId;
     editElement(result)
       .then((res) => {
-        console.log(res);
-
         editElementLocal(res);
       })
       .catch(() => {})
@@ -190,30 +171,17 @@ elEditForm.addEventListener("submit", (evt) => {
   }
 });
 
-// Pagination
-
 const elPagination = document.getElementById("pagination");
-
 elPagination.addEventListener("click", (evt) => {
   if (evt.target.classList.contains("js-page")) {
     skip = evt.target.dataset.skip;
-
     getAll(`?limit=${limit}&skip=${skip}`)
       .then((res) => {
-        elLoading.classList.remove("hidden");
-        elFilterInput.classList.add("hidden");
-        elFilterInput.classList.remove("flex");
-        backendData = res;
         ui(res.data);
         pagination(res.total, res.limit, res.skip);
       })
       .catch((error) => {
         alert(error.message);
-      })
-      .finally(() => {
-        elLoading.classList.add("hidden");
-        elFilterInput.classList.remove("hidden");
-        elFilterInput.classList.add("flex");
       });
   }
 });

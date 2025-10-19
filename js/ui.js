@@ -1,41 +1,27 @@
 export function ui(data) {
   const elContainer = document.getElementById("container");
   elContainer.innerHTML = null;
-  data.forEach((element) => {
+  data.forEach((el) => {
     const clone = document
       .getElementById("cardTemplate")
       .cloneNode(true).content;
 
     const elTitle = clone.querySelector("h2");
-    const elDescription = clone.querySelector("#description");
-    const elYear = clone.querySelector("#year");
-    const elCountry = clone.querySelector("#country");
-    const elCategory = clone.querySelector("#category");
-    const elMaxSpeed = clone.querySelector("#maxSpeed");
-    const elHorsePower = clone.querySelector("#horsepower");
-    const elColorName = clone.querySelector("#colorName");
-
+    const elDescription = clone.querySelector("p");
+    const elInfoBtn = clone.querySelector(".js-info");
     const elEditBtn = clone.querySelector(".js-edit");
     const elDeleteBtn = clone.querySelector(".js-delete");
-    const elInfoBtn = clone.querySelector(".js-info");
 
-    elEditBtn.id = element.id;
-    elDeleteBtn.id = element.id;
-    elInfoBtn.href = `/pages/details.html?id=${element.id}`;
+    elDeleteBtn.id = el.id;
+    elEditBtn.id = el.id;
+    elInfoBtn.href = `/pages/details.html?id=${el.id}`;
 
-    elTitle.innerText = element.name;
-    elDescription.innerText = element.description;
-    elYear.innerHTML = `<strong>Yil:</strong> ${element.year}`;
-    elColorName.innerHTML = `<strong>Rang:</strong> ${element.colorName}`;
-    elCountry.innerHTML = `<strong>Davlat:</strong> ${element.country}`;
-    elCategory.innerHTML = `<strong>Turkum:</strong> ${element.category}`;
-    elMaxSpeed.innerHTML = `<strong>Max Tezligi:</strong> ${element.maxSpeed}`;
-    elHorsePower.innerHTML = `<strong>Ot kuchi:</strong> ${element.horsepower}`;
-    elContainer.append(clone);
+    elTitle.innerText = el.name;
+    elDescription.innerText = el.description;
+
+    elContainer.appendChild(clone);
   });
 }
-
-// Pagination
 
 export function pagination(total, limit, skip) {
   const elPagination = document.getElementById("pagination");
@@ -51,15 +37,19 @@ export function pagination(total, limit, skip) {
       button.classList.add("btn-active");
     }
     button.innerText = i;
-    button.dataset.limit = limit;
     button.dataset.skip = limit * i - limit;
+
     elPagination.appendChild(button);
   }
-
+  // oxirgi sahifa
   if (remained > 0) {
     const button = document.createElement("button");
     button.classList.add("join-item", "btn", "js-page");
+    if (activePage === pageCount + 1) {
+      button.classList.add("btn-active");
+    }
     button.innerText = pageCount + 1;
     elPagination.appendChild(button);
+    button.dataset.skip = pageCount * limit;
   }
 }

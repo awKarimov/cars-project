@@ -4,98 +4,97 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="./css/output.css" />
+    <link rel="stylesheet" href="css/output.css" />
   </head>
   <body>
-    <!-- Offline Page -->
-    <div
-      class="fixed inset-0 bg-accent items-center justify-center z-10 hidden"
-      id="offlinePage">
-      <div class="">
-        <h2>Internet bilan ulanishda muammo bor😢</h2>
-        <p>Saytdan foydalanish uchun Internetga ulaning!</p>
+    <!-- Internet yo'qligida chiqadigan biror narsa -->
+
+    <div class="fixed inset-0 bg-accent flex items-center" id="offlinePage">
+      <div class="flex flex-col max-w-96 w-full">
+        <h2 class="text-3xl mb-3">Internet bilan muammo bor</h2>
+        <p>
+          Siz hozir offline holatidasiz. Saytdan foydalanish uchun internetga
+          ulaning
+        </p>
       </div>
-    </div>
-
-    <!-- Loading -->
-
-    <div class="flex justify-center items-center h-screen" id="loading">
-      <span class="loading loading-spinner loading-xl"></span>
     </div>
 
     <!-- Filter -->
 
     <section class="py-10">
       <div class="container mx-auto px-5">
-        <div class="hidden justify-between mr-11" id="filterInput">
+        <div class="flex">
           <div class="flex items-center gap-5 pb-5">
             <select class="select select-primary" id="filterTypeSelect">
               <option disabled selected>
-                Nima bo`yicha filter qilmoqchisiz
+                Nima bo'yicha filter qilmoqchisiz?
               </option>
-              <option value="country">Davlat</option>
               <option value="colorName">Rang</option>
               <option value="category">Turkum</option>
               <option value="year">Yil</option>
+              <option value="country">Davlat</option>
+              <option value="maxSpeed">Tezlik</option>
             </select>
-            <select class="hidden select select-primary" id="filterValueSelect">
+            <select class="select select-primary hidden" id="filterValueSelect">
               <option disabled selected>All</option>
             </select>
-            <label class="input">
-              <svg
-                class="h-[1em] opacity-50"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24">
-                <g
-                  stroke-linejoin="round"
-                  stroke-linecap="round"
-                  stroke-width="2.5"
-                  fill="none"
-                  stroke="currentColor">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </g>
-              </svg>
-              <input
-                type="search"
-                class="grow"
-                placeholder="Search"
-                id="searchInput" />
-              <kbd class="kbd kbd-sm">⌘</kbd>
-              <kbd class="kbd kbd-sm">K</kbd>
-            </label>
           </div>
-          <div>
-            <button class="btn btn-success" id="addCar">Add</button>
-          </div>
+          <label class="input">
+            <svg
+              class="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24">
+              <g
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                stroke-width="2.5"
+                fill="none"
+                stroke="currentColor">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </g>
+            </svg>
+            <input
+              type="search"
+              class="grow"
+              placeholder="Search"
+              id="searchInput" />
+            <kbd class="kbd kbd-sm">⌘</kbd>
+            <kbd class="kbd kbd-sm">K</kbd>
+          </label>
         </div>
+
         <div class="grid grid-cols-3 gap-5" id="container"></div>
+
+        <!-- Pagination -->
+        <div class="join mb-5 pt-[20px] mx-auto" id="pagination"></div>
       </div>
     </section>
-
-    <div class="join container mx-auto mb-8" id="pagination"></div>
 
     <!-- Modals -->
 
     <dialog id="editModal" class="modal">
       <div class="modal-box">
-        <form method="dialog">
-          <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-            ✕
-          </button>
-        </form>
         <h3 class="text-lg font-bold" id="editedElementTitle"></h3>
         <p class="py-4">Siz shu elementni tahrirlayapsiz</p>
         <form id="editForm">
-          <input type="text" name="name" placeholder="name" class="input" />
           <input
             type="text"
-            name="description"
-            placeholder="description"
+            name="name"
+            placeholder="Mashina nomi"
             class="input" />
-          <button class="btn btn-active">Tasdiqlash</button>
+          <textarea
+            name="description"
+            class="textarea"
+            placeholder="Description"></textarea>
+          <button class="btn btn-active" type="submit">Tasdiqlash</button>
         </form>
+        <div class="modal-action">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="btn">Close</button>
+          </form>
+        </div>
       </div>
     </dialog>
 
@@ -104,13 +103,7 @@
       <div class="card w-96 bg-base-100 card-md shadow-sm">
         <div class="card-body">
           <h2 class="card-title"></h2>
-          <p id="description"></p>
-          <p id="country"></p>
-          <p id="year"></p>
-          <p id="category"></p>
-          <p id="maxSpeed"></p>
-          <p id="horsepower"></p>
-          <p id="colorName"></p>
+          <p></p>
           <div class="justify-end card-actions">
             <button class="btn btn-error js-delete">
               <svg
@@ -142,7 +135,7 @@
                   clip-rule="evenodd"></path>
               </svg>
             </button>
-            <a target="_blank" class="btn btn-info js-info">
+            <a class="btn btn-info js-info" target="_blank">
               <svg
                 class="pointer-events-none"
                 width="15"
@@ -162,6 +155,9 @@
       </div>
     </template>
 
-    <script type="module" src="./js/app.js"></script>
+    <!-- Pagination -->
+    <div class="join mb-5" id="pagination"></div>
+
+    <script type="module" src="js/app.js"></script>
   </body>
 </html>

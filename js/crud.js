@@ -1,13 +1,13 @@
-import { changeLocalData, localData } from "./localData.js";
+import { changeLocaleData, localData } from "./local-data.js";
 
 export function deleteElementLocal(id) {
   const result = localData.filter((el) => el.id != id);
-  changeLocalData(result);
+  changeLocaleData(result);
 }
 
 export function addElementLocal(newData) {
   const result = [newData, ...localData];
-  changeLocalData(result);
+  changeLocaleData(result);
 }
 
 export function editElementLocal(editedData) {
@@ -18,6 +18,5 @@ export function editElementLocal(editedData) {
       return el;
     }
   });
-
-  changeLocalData(result);
+  changeLocaleData(result);
 }
