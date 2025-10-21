@@ -1,6 +1,6 @@
 import { checkAuth } from "./check-auth.js";
 import { deleteElementLocal, editElementLocal } from "./crud.js";
-import { changeLocaleData, localData } from "./local-data.js";
+import { changeLocaleData, localData } from "./localData.js";
 import { deleteElement, editElement, getAll } from "./request.js";
 import { pagination, ui } from "./ui.js";
 
@@ -30,6 +30,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   getAll(`?limit=${limit}&skip=${skip}`)
     .then((res) => {
+      console.log(res);
+
       backendData = res;
       pagination(backendData.total, backendData.limit, backendData.skip);
       changeLocaleData(backendData.data);
@@ -91,7 +93,8 @@ worker.addEventListener("message", (evt) => {
     });
   } else if (response.target === "search") {
     const elContainer = document.getElementById("container");
-    elContainer.innerHTML = "";
+    elContainer.innerHTML = null;
+
     if (response.result.length > 0) {
       ui(response.result);
     } else {
