@@ -31,13 +31,20 @@ window.addEventListener("DOMContentLoaded", () => {
     elOfflinePage.classList.add("hidden");
   }
 
+  getAll()
+    .then((res) => {
+      backendData = res;
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+
   getAll(`?limit=${limit}&skip=${skip}`)
     .then((res) => {
       elFilterSearch.classList.remove("flex");
       elFilterSearch.classList.add("hidden");
-      backendData = res;
-      pagination(backendData.total, backendData.limit, backendData.skip);
-      changeLocaleData(backendData.data);
+      pagination(res.total, res.limit, res.skip);
+      changeLocaleData(res.data);
     })
     .catch((error) => {
       alert(error.message);
