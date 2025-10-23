@@ -7,7 +7,12 @@ export function ui(data) {
       .cloneNode(true).content;
 
     const elTitle = clone.querySelector("h2");
-    const elDescription = clone.querySelector("p");
+    const elDescription = clone.querySelector("#description");
+    const elCountry = clone.querySelector("#country");
+    const elCategory = clone.querySelector("#category");
+    const elYear = clone.querySelector("#year");
+    const elColorName = clone.querySelector("#colorName");
+    const elMaxSpeed = clone.querySelector("#maxSpeed");
     const elInfoBtn = clone.querySelector(".js-info");
     const elEditBtn = clone.querySelector(".js-edit");
     const elDeleteBtn = clone.querySelector(".js-delete");
@@ -16,8 +21,13 @@ export function ui(data) {
     elEditBtn.id = el.id;
     elInfoBtn.href = `/pages/details.html?id=${el.id}`;
 
-    elTitle.innerText = el.name;
-    elDescription.innerText = el.description;
+    elTitle.innerHTML = `<strong>${el.name}</strong> `;
+    elDescription.innerHTML = `${el.description}`;
+    elCategory.innerHTML = `<strong>Turkum:</strong> ${el.category}`;
+    elCountry.innerHTML = `<strong>Davlat:</strong> ${el.country}`;
+    elYear.innerHTML = `<strong>Yili:</strong> ${el.year}`;
+    elMaxSpeed.innerHTML = `<strong>Max Tezligi:</strong> ${el.maxSpeed}`;
+    elColorName.innerHTML = `<strong>Rang: </strong> ${el.colorName}`;
 
     elContainer.appendChild(clone);
   });
@@ -30,26 +40,17 @@ export function pagination(total, limit, skip) {
   const pageCount = (total - remained) / limit;
   let activePage = skip / limit + 1;
 
-  for (let i = 1; i <= pageCount; i++) {
+  for (let i = 1; i <= pageCount + (remained > 0 ? 1 : 0); i++) {
     const button = document.createElement("button");
-    button.classList.add("join-item", "btn", "js-page");
-    if (activePage === i) {
-      button.classList.add("btn-active");
-    }
+    button.classList.add(
+      "join-item",
+      "btn",
+      "js-page",
+      activePage === i ? "btn-active" : null
+    );
     button.innerText = i;
     button.dataset.skip = limit * i - limit;
 
     elPagination.appendChild(button);
-  }
-  // oxirgi sahifa
-  if (remained > 0) {
-    const button = document.createElement("button");
-    button.classList.add("join-item", "btn", "js-page");
-    if (activePage === pageCount + 1) {
-      button.classList.add("btn-active");
-    }
-    button.innerText = pageCount + 1;
-    elPagination.appendChild(button);
-    button.dataset.skip = pageCount * limit;
   }
 }

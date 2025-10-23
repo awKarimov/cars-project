@@ -19,11 +19,16 @@
       </div>
     </div>
 
+    <!-- Loading -->
+    <div class="flex justify-center items-center h-screen" id="loading">
+      <span class="loading loading-spinner loading-xl"></span>
+    </div>
+
     <!-- Filter -->
 
     <section class="py-10">
       <div class="container mx-auto px-5">
-        <div class="flex">
+        <div class="hidden" id="filterSearch">
           <div class="flex items-center gap-5 pb-5">
             <select class="select select-primary" id="filterTypeSelect">
               <option disabled selected>
@@ -103,7 +108,13 @@
       <div class="card w-96 bg-base-100 card-md shadow-sm">
         <div class="card-body">
           <h2 class="card-title"></h2>
-          <p></p>
+          <p id="description"></p>
+          <p id="country"></p>
+          <p id="category"></p>
+          <p id="year"></p>
+          <p id="maxSpeed"></p>
+          <p id="colorName"></p>
+
           <div class="justify-end card-actions">
             <button class="btn btn-error js-delete">
               <svg

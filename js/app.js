@@ -7,7 +7,6 @@ import { pagination, ui } from "./ui.js";
 const limit = 12;
 let skip = 0;
 
-// Internet yo'qligida chiqivchi biror narsa
 const elEditModal = document.getElementById("editModal");
 const elEditedForm = document.getElementById("editForm");
 const elContainer = document.getElementById("container");
@@ -15,6 +14,9 @@ const elOfflinePage = document.getElementById("offlinePage");
 const elFilterTypeSelect = document.getElementById("filterTypeSelect");
 const elFilterValueSelect = document.getElementById("filterValueSelect");
 const elSearchInput = document.getElementById("searchInput");
+const elLoading = document.getElementById("loading");
+const elFilterSearch = document.getElementById("filterSearch");
+const elPagination = document.getElementById("pagination");
 
 let backendData = null;
 let worker = new Worker("./worker.js");
@@ -28,17 +30,33 @@ window.addEventListener("DOMContentLoaded", () => {
   } else {
     elOfflinePage.classList.add("hidden");
   }
+
   getAll(`?limit=${limit}&skip=${skip}`)
     .then((res) => {
-      console.log(res);
-
+      elFilterSearch.classList.remove("flex");
+      elFilterSearch.classList.add("hidden");
       backendData = res;
       pagination(backendData.total, backendData.limit, backendData.skip);
       changeLocaleData(backendData.data);
     })
     .catch((error) => {
       alert(error.message);
+    })
+    .finally(() => {
+      elLoading.classList.add("hidden");
+      elFilterSearch.classList.add("flex");
+      elFilterSearch.classList.remove("hidden");
     });
+});
+
+window.addEventListener("online", () => {
+  elOfflinePage.classList.add("hidden");
+  elOfflinePage.classList.remove("z-10");
+});
+
+window.addEventListener("offline", () => {
+  elOfflinePage.classList.remove("hidden");
+  elOfflinePage.classList.add("z-10");
 });
 
 elFilterTypeSelect.addEventListener("change", (evt) => {
@@ -85,7 +103,7 @@ worker.addEventListener("message", (evt) => {
     option.disabled = true;
     option.textContent = "All";
     elFilterValueSelect.appendChild(option);
-    result.forEach((el) => {
+    response.result.forEach((el) => {
       const option = document.createElement("option");
       option.value = el;
       option.textContent = el;
@@ -101,14 +119,6 @@ worker.addEventListener("message", (evt) => {
       alert("No data");
     }
   }
-});
-
-window.addEventListener("online", () => {
-  elOfflinePage.classList.add("hidden");
-});
-
-window.addEventListener("offline", () => {
-  elOfflinePage.classList.remove("hidden");
 });
 
 // crud
@@ -174,7 +184,6 @@ elEditedForm.addEventListener("submit", (evt) => {
   }
 });
 
-const elPagination = document.getElementById("pagination");
 elPagination.addEventListener("click", (evt) => {
   if (evt.target.classList.contains("js-page")) {
     skip = evt.target.dataset.skip;
